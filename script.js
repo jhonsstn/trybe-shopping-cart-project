@@ -30,7 +30,8 @@ function getSkuFromProductItem(item) {
 }
 
 function cartItemClickListener(event) {
-  // coloque seu código aqui
+  const element = event.target;
+  element.remove();
 }
 
 function createCartItemElement({ sku, name, salePrice }) {
@@ -41,6 +42,26 @@ function createCartItemElement({ sku, name, salePrice }) {
   return li;
 }
 
+const addToCart = async (event) => {
+  const cartContainer = document.querySelector('.cart__items');
+  const itemButton = event.target;
+  const itemId = itemButton.parentNode.childNodes[0].innerText;
+  const item = await fetchItem(itemId);
+  const { id: sku, title: name, price: salePrice } = item;
+  const itemOnCart = createCartItemElement({ sku, name, salePrice });
+  itemOnCart.addEventListener('click', cartItemClickListener);
+  cartContainer.appendChild(itemOnCart);
+};
+
+const addEventListenerToButtons = () => {
+  const itemsButtons = document.querySelectorAll('.item__add');
+  console.log(itemsButtons);
+  itemsButtons.forEach((button) => {
+    console.log('Adicionado Evento');
+    button.addEventListener('click', addToCart);
+  });
+};
+
 const productsListing = async () => {
   const itemsContainer = document.querySelector('.items');
   const productsList = await fetchProducts('computador');
@@ -49,6 +70,7 @@ const productsListing = async () => {
     const itemLi = createProductItemElement({ sku, name, image });
     itemsContainer.appendChild(itemLi);
   });
+  await addEventListenerToButtons();
 };
 
 window.onload = () => {
