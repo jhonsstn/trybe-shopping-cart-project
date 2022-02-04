@@ -20,13 +20,15 @@ function createProductItemElement({ sku, name, image }) {
   section.appendChild(createCustomElement('span', 'item__title', name));
   section.appendChild(createProductImageElement(image));
   section.appendChild(
-    createCustomElement('button', 'item__add', 'Adicionar ao carrinho!')
+    createCustomElement('button', 'item__add', 'Adicionar ao carrinho!'),
   );
   return section;
 }
 
-function getSkuFromProductItem(item) {
-  return item.querySelector('span.item__sku').innerText;
+function getSkuFromProductItem(event) {
+  const itemButton = event.target;
+  itemSku = itemButton.parentNode.childNodes[0].innerText;
+  return itemSku;
 }
 
 function cartItemClickListener(event) {
@@ -44,20 +46,17 @@ function createCartItemElement({ sku, name, salePrice }) {
 
 const addToCart = async (event) => {
   const cartContainer = document.querySelector('.cart__items');
-  const itemButton = event.target;
-  const itemId = itemButton.parentNode.childNodes[0].innerText;
-  const item = await fetchItem(itemId);
+  const itemSku = getSkuFromProductItem(event);
+  const item = await fetchItem(itemSku);
   const { id: sku, title: name, price: salePrice } = item;
   const itemOnCart = createCartItemElement({ sku, name, salePrice });
-  itemOnCart.addEventListener('click', cartItemClickListener);
+  console.log(itemOnCart);
   cartContainer.appendChild(itemOnCart);
 };
 
 const addEventListenerToButtons = () => {
   const itemsButtons = document.querySelectorAll('.item__add');
-  console.log(itemsButtons);
   itemsButtons.forEach((button) => {
-    console.log('Adicionado Evento');
     button.addEventListener('click', addToCart);
   });
 };

@@ -3,7 +3,9 @@
 # VSCode repo settings
 .vscode
 .DS_Store
+.prettierrc.json
 node_modules/
 cypress/reports
 cypress/screenshots
 coverage/
+
