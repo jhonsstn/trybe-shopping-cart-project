@@ -3,7 +3,18 @@ const saveCartItems = require('../helpers/saveCartItems');
 
 localStorageSimulator('setItem');
 
-describe('4 - Teste a função saveCartItems', () => {
-  // implemente seus testes aqui
-  fail('Teste vazio');
+describe('4 - The "saveCartItems" functions', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+  it('should call the "localStorage.setItem" method if called with "<ol><li>Item</li></ol>" argument.', async () => {
+    saveCartItems('<ol><li>Item</li></ol>');
+    expect(localStorage.setItem).toHaveBeenCalled();
+  });
+
+  it('should call the "localStorage.setItem" method with "cartItems" and  "<ol><li>Item</li></ol>" arguments if called with "<ol><li>Item</li></ol>" argument.', async () => {
+    const item = '<ol><li>Item</li></ol>';
+    saveCartItems(item);
+    expect(localStorage.setItem).toHaveBeenCalledWith('cartItems', item);
+  });
 });
