@@ -44,14 +44,24 @@ function createCartItemElement({ sku, name, salePrice }) {
   return li;
 }
 
+const productsToSave = [];
+const saveLocalStorage = (sku, name, salePrice) => {
+  const itemObject = { sku, name, salePrice };
+  productsToSave.push(itemObject);
+  const stringifiedProducts = JSON.stringify(productsToSave);
+  saveCartItems(stringifiedProducts);
+};
+
 const addToCart = async (event) => {
   const cartContainer = document.querySelector('.cart__items');
   const itemSku = getSkuFromProductItem(event);
   const item = await fetchItem(itemSku);
   const { id: sku, title: name, price: salePrice } = item;
   const itemOnCart = createCartItemElement({ sku, name, salePrice });
-  console.log(itemOnCart);
+
+  saveLocalStorage(sku, name, salePrice);
   cartContainer.appendChild(itemOnCart);
+  console.log(cartContainer);
 };
 
 const addEventListenerToButtons = () => {
@@ -72,6 +82,20 @@ const productsListing = async () => {
   await addEventListenerToButtons();
 };
 
+const loadLocalStorage = () => {
+  if (getSavedCartItems()) {
+    const cartContainer = document.querySelector('.cart__items');
+    const productsToLoad = JSON.parse(getSavedCartItems());
+    console.log(productsToLoad);
+    productsToLoad.forEach((product) => {
+      const { sku, name, salePrice } = product;
+      const itemOnCart = createCartItemElement({ sku, name, salePrice });
+      cartContainer.appendChild(itemOnCart);
+    });
+  }
+};
+
 window.onload = () => {
   productsListing();
+  loadLocalStorage();
 };
