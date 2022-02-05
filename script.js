@@ -39,6 +39,7 @@ const addLoading = () => {
   itemsContainer.appendChild(
     createCustomElement('span', 'loading', 'carregando...'),
   );
+  totalPriceElement.innerText = '0,00';
 };
 
 const removeLoading = () => {
@@ -48,20 +49,46 @@ const removeLoading = () => {
 let totalPrice = 0;
 const addToPrice = (itemPrice) => {
   totalPrice += itemPrice;
-  totalPriceElement.innerText = totalPrice;
+  totalPriceElement.innerText = parseFloat(totalPrice.toFixed(2));
 };
 
 const removeFromPrice = (element) => {
   const elementText = element.innerText;
   const itemPrice = parseFloat(elementText.split('$')[1]);
   totalPrice -= itemPrice;
-  totalPriceElement.innerText = totalPrice;
+  totalPriceElement.innerText = parseFloat(totalPrice.toFixed(2));
+};
+
+const saveLocalStorage = (sku, name, salePrice) => {
+  const itemObject = { sku, name, salePrice };
+  if (getSavedCartItems()) {
+    const storageItems = JSON.parse(getSavedCartItems());
+    console.log(storageItems);
+    storageItems.push(itemObject);
+    saveCartItems(JSON.stringify(storageItems));
+  } else {
+    const productsToSave = [];
+    productsToSave.push(itemObject);
+    saveCartItems(JSON.stringify(productsToSave));
+  }
+};
+
+const removeItemFromStorage = () => {
+  const cartItems = document.querySelectorAll('.cart__item');
+  localStorage.clear();
+  cartItems.forEach(async (item) => {
+    const itemSplitted = item.innerText.split(' ')[1];
+    const fetchedItem = await fetchItem(itemSplitted);
+    const { id: sku, title: name, price: salePrice } = fetchedItem;
+    saveLocalStorage(sku, name, salePrice);
+  });
 };
 
 function cartItemClickListener(event) {
   const element = event.target;
   element.remove();
   removeFromPrice(event.target);
+  removeItemFromStorage();
 }
 
 function createCartItemElement({ sku, name, salePrice }) {
@@ -71,14 +98,6 @@ function createCartItemElement({ sku, name, salePrice }) {
   li.addEventListener('click', cartItemClickListener);
   return li;
 }
-
-const productsToSave = [];
-const saveLocalStorage = (sku, name, salePrice) => {
-  const itemObject = { sku, name, salePrice };
-  productsToSave.push(itemObject);
-  const stringifiedProducts = JSON.stringify(productsToSave);
-  saveCartItems(stringifiedProducts);
-};
 
 const addToCart = async (event) => {
   const itemSku = getSkuFromProductItem(event);
@@ -113,6 +132,7 @@ const loadLocalStorage = () => {
     const productsToLoad = JSON.parse(getSavedCartItems());
     productsToLoad.forEach((product) => {
       const { sku, name, salePrice } = product;
+      addToPrice(salePrice);
       const itemOnCart = createCartItemElement({ sku, name, salePrice });
       cartContainer.appendChild(itemOnCart);
     });
@@ -124,6 +144,8 @@ const clearCart = () => {
   clearCartButton.addEventListener('click', () => {
     cartContainer.innerHTML = null;
     localStorage.clear();
+    totalPrice = 0; // Zera a variável de valor do carrinho usada nas funções de preço
+    totalPriceElement.innerText = '0.00';
   });
 };
 

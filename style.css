@@ -140,10 +140,21 @@ body {
   overflow-y: scroll;
 }
 
+.cart .cart__item {
+  margin-top: 10px;
+  border-bottom: solid 1px gray;
+}
+
 .empty-cart {
   width: 170px;
   height: 35px;
   margin: 0 auto;
   border: 2px solid rgb(5, 52, 219);
   background-color: rgb(249, 249, 246);
+}
+
+.cart-price {
+  display: flex;
+  margin: 0 auto;
+  margin-bottom: 10px;
 }
